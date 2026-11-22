@@ -1,0 +1,40 @@
+[
+  {
+    "id": "01-hook",
+    "text": "You can actually hear the temperature of water—even though temperature doesn’t make a sound."
+  },
+  {
+    "id": "02-cold",
+    "text": "Listen to these two pours.",
+    "pour": "cold"
+  },
+  {
+    "id": "03-hot",
+    "text": "Now compare it to this one.",
+    "pour": "hot"
+  },
+  {
+    "id": "04-reveal",
+    "text": "That second pour is boiling hot—and your brain already knew that before seeing a single drop of steam."
+  },
+  {
+    "id": "05-viscosity",
+    "text": "Here’s why. When water heats up, its viscosity drops—meaning the molecules move faster and the liquid becomes thinner and less syrupy."
+  },
+  {
+    "id": "06-cold-bubbles",
+    "text": "Cold, thicker water traps larger air bubbles when you pour it, creating deeper, lower-frequency vibrations."
+  },
+  {
+    "id": "07-hot-bubbles",
+    "text": "Hot, thinner water breaks into much smaller bubbles and shifts how sound waves bounce inside the air space of the cup—pushing the pitch noticeably higher."
+  },
+  {
+    "id": "08-brain",
+    "text": "Because you’ve heard thousands of drinks poured over your life, your brain subconsciously trained itself to recognize that exact acoustic shift as heat."
+  },
+  {
+    "id": "09-test",
+    "text": "Test it in your kitchen tonight—and follow for more everyday physics"
+  }
+]
