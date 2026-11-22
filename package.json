@@ -1,0 +1,33 @@
+{
+  "name": "water-sound",
+  "version": "1.0.0",
+  "private": true,
+  "description": "You can hear the temperature of water - Remotion + Three.js short video",
+  "scripts": {
+    "predev": "node scripts/make-audio.mjs",
+    "dev": "remotion studio",
+    "audio": "node scripts/make-audio.mjs",
+    "voiceover": "node scripts/make-voiceover.mjs",
+    "prerender": "node scripts/make-audio.mjs",
+    "render": "remotion render WaterSound out/water-sound.mp4 --gl=angle",
+    "render:ci": "remotion render WaterSound out/water-sound.mp4 --gl=swangle",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.3.0",
+    "@remotion/cli": "4.0.528",
+    "@remotion/google-fonts": "4.0.528",
+    "@remotion/media": "4.0.528",
+    "@remotion/three": "4.0.528",
+    "mediabunny": "^1.0.0",
+    "react": "~19.2.0",
+    "react-dom": "~19.2.0",
+    "remotion": "4.0.528",
+    "three": "0.178.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/three": "0.178.0",
+    "typescript": "^5.6.0"
+  }
+}
