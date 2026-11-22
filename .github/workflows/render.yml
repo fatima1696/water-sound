@@ -1,0 +1,106 @@
+name: Render video
+
+# Run it from the Actions tab: "Render video" -> "Run workflow".
+on:
+  workflow_dispatch:
+    inputs:
+      scenes:
+        description: "Also render every scene as its own clip (9 extra jobs)"
+        type: boolean
+        default: true
+      scale:
+        description: "Resolution scale: 1 = 1080x1920, 0.5 = fast preview"
+        type: string
+        default: "1"
+
+env:
+  # Chrome needs these libraries on a bare Ubuntu runner
+  APT_PACKAGES: >-
+    libnss3 libdbus-1-3 libatk1.0-0 libgbm-dev libasound2t64 libxrandr2 libxkbcommon-dev
+    libxfixes3 libxcomposite1 libxdamage1 libatk-bridge2.0-0 libpango-1.0-0 libcairo2 libcups2
+
+jobs:
+  # 1) Make the voiceover and sounds ONCE, so every render job below uses the identical files.
+  assets:
+    name: Voiceover and sound
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install edge-tts (free voice, used when no ElevenLabs key is set)
+        run: pip install edge-tts
+      - name: Sound effects and music
+        run: node scripts/make-audio.mjs
+      - name: Voiceover
+        run: node scripts/make-voiceover.mjs
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ vars.ELEVENLABS_VOICE_ID }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: assets
+          path: public
+          retention-days: 7
+
+  # 2) The full video
+  render-full:
+    name: Render full video
+    needs: assets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: assets
+          path: public
+      - name: Chrome dependencies
+        run: sudo apt-get update && sudo apt-get install -y $APT_PACKAGES
+      - run: npm install --no-audit --no-fund
+      - name: Render
+        run: npx remotion render WaterSound out/water-sound.mp4 --gl=swangle --scale=${{ inputs.scale }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: water-sound-full
+          path: out/water-sound.mp4
+          retention-days: 14
+
+  # 3) One clip per scene, all in parallel
+  render-scenes:
+    name: Render scene ${{ matrix.scene }}
+    if: ${{ inputs.scenes }}
+    needs: assets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        scene: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: assets
+          path: public
+      - name: Chrome dependencies
+        run: sudo apt-get update && sudo apt-get install -y $APT_PACKAGES
+      - run: npm install --no-audit --no-fund
+      - name: Render
+        run: npx remotion render Scene-${{ matrix.scene }} out/scene-${{ matrix.scene }}.mp4 --gl=swangle --scale=${{ inputs.scale }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scene-${{ matrix.scene }}
+          path: out/scene-${{ matrix.scene }}.mp4
+          retention-days: 14
